@@ -1,6 +1,8 @@
 Example Voting App
 =========
-Build status: [![Build Status](http://34.72.236.24:8080/buildStatus/icon?job=instavote%2Fworker-build)](http://34.72.236.24:8080/job/instavote/job/worker-build/) 
+Build status: 
+* [![Build Status](http://34.72.236.24:8080/buildStatus/icon?job=instavote%2Fworker-build)](http://34.72.236.24:8080/job/instavote/job/worker-build/)
+* [![Build Status](http://34.72.236.24:8080/buildStatus/icon?job=instavote%2Fworker-test&subject=Unit%20Test)](http://34.72.236.24:8080/job/instavote/job/worker-test/) 
 
 
 Getting started
