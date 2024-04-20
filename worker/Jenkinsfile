@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'maven:3.9.6-sapmachine-17'
-            args '-v $HOME/.m2:/root/.m2 -u root --privileged'
+            args '-v $HOME/.m2:/root/.m2'
         }
     }
     stages {
