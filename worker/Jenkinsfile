@@ -1,13 +1,16 @@
 pipeline {
-    agent any
-    tools {
-        maven 'maven 3.9.6'
-    }
+    agent none
     stages {
         stage('build') {
-			when {
-				changeset "**/worker/**"
-			}
+            when {
+                changeset '**/worker/**'
+            }
+            agent {
+                docker {
+                    image 'maven:3.9.6-sapmachine-17'
+                    args '-v $HOME/.m2:/root/.m2'
+                }
+            }
             steps {
                 echo 'Compiling worker app..'
                 dir('worker') {
@@ -16,9 +19,15 @@ pipeline {
             }
         }
         stage('test') {
-			when {
-				changeset "**/worker/**"
-			}
+            when {
+                changeset '**/worker/**'
+            }
+            agent {
+                docker {
+                    image 'maven:3.9.6-sapmachine-17'
+                    args '-v $HOME/.m2:/root/.m2'
+                }
+            }
             steps {
                 echo 'Running Unit Tests on worker app..'
                 dir('worker') {
@@ -27,21 +36,46 @@ pipeline {
             }
         }
         stage('package') {
-			when {
-				branch 'master'
-				changeset "**/worker/**"
-			}
+            when {
+                branch 'master'
+                changeset '**/worker/**'
+            }
+            agent {
+                docker {
+                    image 'maven:3.9.6-sapmachine-17'
+                    args '-v $HOME/.m2:/root/.m2'
+                }
+            }
             steps {
                 echo 'Packaging worker app'
                 dir('worker') {
                     sh 'mvn package -DskipTests'
-					archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+                    archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+                }
+            }
+        }
+        stage('docker-package') {
+            agent any
+            when {
+                branch 'master'
+                changeset '**/worker/**'
+            }
+            steps {
+                echo 'Packaging worker app with docker'
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerlogin') {
+                        def workerImage = docker.build("kzwolenik95/worker:v${env.BUILD_ID}", './worker')
+                        workerImage.push()
+                        workerImage.push("${env.BRANCH_NAME}")
+                        workerImage.push('latest')
+                    }
                 }
             }
         }
     }
     post {
         always {
+            slackSend(channel: '#ci-cd', message: "Build completed: ${currentBuild.currentResult} ${env.JOB_NAME} ${env.BUILD_NUMBER}")
             echo 'Building multibranch pipeline for worker is completed..'
         }
     }
