@@ -1,0 +1,45 @@
+pipeline {
+    agent none
+    stages {
+        stage('build') {
+            when {
+                changeset '**/vote/**'
+            }
+            agent {
+                docker {
+                    image 'python:2.7-alpine'
+                }
+            }
+            steps {
+                echo 'Compiling vote app..'
+                dir('vote') {
+                    sh 'pip install -r requirements.txt'
+                }
+            }
+        }
+        stage('docker-package') {
+            agent any
+            when {
+                branch 'master'
+                changeset '**/vote/**'
+            }
+            steps {
+                echo 'Packaging vote app with docker'
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerlogin') {
+                        def voteImage = docker.build("kzwolenik95/vote:v${env.BUILD_ID}", './vote')
+                        voteImage.push()
+                        voteImage.push("${env.BRANCH_NAME}")
+                        voteImage.push('latest')
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            slackSend(channel: '#ci-cd', message: "Build completed: ${currentBuild.currentresult} ${env.JOB_NAME} ${env.BUILD_NUMBER}")
+            echo 'Building multibranch pipeline for vote is completed..'
+        }
+    }
+}
