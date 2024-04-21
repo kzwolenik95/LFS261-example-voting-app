@@ -34,6 +34,7 @@ pipeline {
     }
     post {
         always {
+            slackSend (channel: "#ci-cd", message: "Build completed: ${currentBuild.currentResult} ${env.JOB_NAME} ${env.BUILD_NUMBER}")
             echo 'Building multibranch pipeline for worker is completed..'
         }
     }
