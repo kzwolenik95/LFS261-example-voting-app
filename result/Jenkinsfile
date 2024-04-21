@@ -1,0 +1,62 @@
+pipeline {
+    agent none
+    stages {
+        stage('build') {
+            when {
+                changeset '**/result/**'
+            }
+            agent {
+                docker {
+                    image 'node:8.16.0-alpine'
+                }
+            }
+            steps {
+                echo 'Compiling result app..'
+                dir('result') {
+                    sh 'npm install'
+                }
+            }
+        }
+        stage('test') {
+            when {
+                changeset '**/result/**'
+            }
+            agent {
+                docker {
+                    image 'node:8.16.0-alpine'
+                }
+            }
+            steps {
+                echo 'Running Unit Tests on result app..'
+                dir('result') {
+                    sh 'npm install'
+                    sh 'npm test'
+                }
+            }
+        }
+        stage('docker-package') {
+            agent any
+            when {
+                branch 'master'
+                changeset '**/result/**'
+            }
+            steps {
+                echo 'Packaging result app with docker'
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerlogin') {
+                        def resultImage = docker.build("kzwolenik95/result:v${env.BUILD_ID}", './result')
+                        resultImage.push()
+                        resultImage.push("${env.BRANCH_NAME}")
+                        resultImage.push('latest')
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            slackSend(channel: '#ci-cd', message: "Build completed: ${currentBuild.currentResult} ${env.JOB_NAME} ${env.BUILD_NUMBER}")
+            echo 'Building multibranch pipeline for result is completed..'
+        }
+    }
+}
