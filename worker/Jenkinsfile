@@ -31,10 +31,23 @@ pipeline {
                 }
             }
         }
+        stage { 'docker-package' } {
+            agent any
+            steps {
+                echo 'Packaging worker app with docker'
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerlogin') {
+                        def workerImage = docker.build("kzwolenik95/worker:v${env.BUILD_ID}", './ worker')
+                        workerImage.push()
+                        workerImage.push('latest')
+                    }
+                }
+            }
+        }
     }
     post {
         always {
-            slackSend (channel: "#ci-cd", message: "Build completed: ${currentBuild.currentResult} ${env.JOB_NAME} ${env.BUILD_NUMBER}")
+            slackSend(channel: '#ci-cd', message: "Build completed: ${currentBuild.currentResult} ${env.JOB_NAME} ${env.BUILD_NUMBER}")
             echo 'Building multibranch pipeline for worker is completed..'
         }
     }
