@@ -57,13 +57,14 @@ pipeline {
         stage('docker-package') {
             agent any
             when {
+                branch 'master'
                 changeset '**/worker/**'
             }
             steps {
                 echo 'Packaging worker app with docker'
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerlogin') {
-                        def workerImage = docker.build("kzwolenik95/worker:v${env.BUILD_ID}", './ worker')
+                        def workerImage = docker.build("kzwolenik95/worker:v${env.BUILD_ID}", './worker')
                         workerImage.push()
                         workerImage.push("${env.BRANCH_NAME}")
                         workerImage.push('latest')
