@@ -8,6 +8,7 @@ networks:
 services:
   vote:
     image: kzwolenik95/vote:latest
+    build: ./vote
     ports:
       - 5002:80
     networks:
@@ -29,6 +30,7 @@ services:
 
   result:
     image: kzwolenik95/result:latest
+    build: ./result
     ports:
       - 5001:4000
     depends_on:
@@ -38,6 +40,7 @@ services:
 
   worker:
     image: kzwolenik95/worker:latest
+    build: ./worker
     depends_on:
       - redis
       - db
