@@ -189,11 +189,21 @@ pipeline {
                 }
             }
         }
+        stage('deploy to dev') {
+            agent any
+            when {
+                branch 'master'
+            }
+            steps {
+                echo 'Deploy instavote app with docker compose'
+                sh 'docker-compose up -d'
+            }
+        }
     }
     post {
         always {
             slackSend(channel: '#ci-cd', message: "Build completed: ${currentBuild.currentResult} ${env.JOB_NAME} ${env.BUILD_NUMBER}")
-            echo 'Building multibranch pipeline for worker is completed..'
+            echo 'Building mono pipeline for voting app is completed..'
         }
     }
 }
