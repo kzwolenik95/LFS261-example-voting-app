@@ -1,0 +1,48 @@
+volumes:
+  db-data:
+
+networks:
+  instavote:
+    driver: bridge
+
+services:
+  vote:
+    image: kzwolenik95/vote:latest
+    build: ./vote
+    ports:
+      - 5002:80
+    networks:
+      - instavote
+
+  redis:
+    image: redis:alpine
+    networks:
+      - instavote
+
+  db:
+    image: postgres:9.4
+    volumes:
+      - "db-data:/var/lib/postgresql/data"
+    networks:
+      - instavote
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+
+  result:
+    image: kzwolenik95/result:latest
+    build: ./result
+    ports:
+      - 5001:4000
+    depends_on:
+      - db
+    networks:
+      - instavote
+
+  worker:
+    image: kzwolenik95/worker:latest
+    build: ./worker
+    depends_on:
+      - redis
+      - db
+    networks:
+      - instavote
