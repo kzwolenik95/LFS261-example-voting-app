@@ -2,9 +2,9 @@ pipeline {
     agent none
     stages {
         stage('worker-build') {
-            when {
-                changeset '**/worker/**'
-            }
+            // when {
+            //     changeset '**/worker/**'
+            // }
             agent {
                 docker {
                     image 'maven:3.9.6-sapmachine-17'
@@ -19,9 +19,9 @@ pipeline {
             }
         }
         stage('vote-build') {
-            when {
-                changeset '**/vote/**'
-            }
+            // when {
+            //     changeset '**/vote/**'
+            // }
             agent {
                 docker {
                     image 'python:2.7-alpine'
@@ -36,9 +36,9 @@ pipeline {
             }
         }
         stage('result-build') {
-            when {
-                changeset '**/result/**'
-            }
+            // when {
+            //     changeset '**/result/**'
+            // }
             agent {
                 docker {
                     image 'node:8.16.0-alpine'
@@ -52,9 +52,9 @@ pipeline {
             }
         }
         stage('worker-test') {
-            when {
-                changeset '**/worker/**'
-            }
+            // when {
+            //     changeset '**/worker/**'
+            // }
             agent {
                 docker {
                     image 'maven:3.9.6-sapmachine-17'
@@ -75,9 +75,9 @@ pipeline {
                     args '-u root --privileged'
                 }
             }
-            when {
-                changeset '**/vote/**'
-            }
+            // when {
+            //     changeset '**/vote/**'
+            // }
             steps {
                 echo 'Running Unit Tests on vote app.'
                 dir(path: 'vote') {
@@ -88,10 +88,10 @@ pipeline {
         }
         stage('vote-integration') {
             agent any
-            when {
-                changeset '**/vote/**'
-                branch 'master'
-            }
+            // when {
+            //     changeset '**/vote/**'
+            //     branch 'master'
+            // }
             steps {
                 echo 'Running Integration Tests on vote app'
                 dir('vote') {
@@ -100,9 +100,9 @@ pipeline {
             }
         }
         stage('result-test') {
-            when {
-                changeset '**/result/**'
-            }
+            // when {
+            //     changeset '**/result/**'
+            // }
             agent {
                 docker {
                     image 'node:8.16.0-alpine'
@@ -117,10 +117,10 @@ pipeline {
             }
         }
         stage('worker-package') {
-            when {
-                branch 'master'
-                changeset '**/worker/**'
-            }
+            // when {
+            //     branch 'master'
+            //     changeset '**/worker/**'
+            // }
             agent {
                 docker {
                     image 'maven:3.9.6-sapmachine-17'
@@ -137,10 +137,10 @@ pipeline {
         }
         stage('vote integration') {
             agent any
-            when {
-                changeset '**/vote/**'
-                branch 'master'
-            }
+            // when {
+            //     changeset '**/vote/**'
+            //     branch 'master'
+            // }
             steps {
                 echo 'Running Integration Tests on vote app'
                 dir('vote') {
@@ -204,9 +204,9 @@ pipeline {
         }
         stage('Sonarqube') {
             agent any
-            when {
-                branch 'master'
-            }
+            // when {
+            //     branch 'master'
+            // }
             environment {
                 sonarpath = tool 'SonarScanner'
             }
