@@ -150,10 +150,10 @@ pipeline {
         }
         stage('worker-docker-package') {
             agent any
-            when {
-                branch 'master'
-                changeset '**/worker/**'
-            }
+            // when {
+            //     branch 'master'
+            //     changeset '**/worker/**'
+            // }
             steps {
                 echo 'Packaging worker app with docker'
                 script {
@@ -168,10 +168,10 @@ pipeline {
         }
         stage('vote-docker-package') {
             agent any
-            when {
-                branch 'master'
-                changeset '**/vote/**'
-            }
+            // when {
+            //     branch 'master'
+            //     changeset '**/vote/**'
+            // }
             steps {
                 echo 'Packaging vote app with docker'
                 script {
@@ -186,10 +186,10 @@ pipeline {
         }
         stage('result-docker-package') {
             agent any
-            when {
-                branch 'master'
-                changeset '**/result/**'
-            }
+            // when {
+            //     branch 'master'
+            //     changeset '**/result/**'
+            // }
             steps {
                 echo 'Packaging result app with docker'
                 script {
@@ -228,9 +228,9 @@ pipeline {
         }
         stage('deploy to dev') {
             agent any
-            when {
-                branch 'master'
-            }
+            // when {
+            //     branch 'master'
+            // }
             steps {
                 echo 'Deploy instavote app with docker compose'
                 sh 'docker-compose up -d'
